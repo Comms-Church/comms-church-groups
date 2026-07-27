@@ -6,9 +6,11 @@ are stored server-side and never exposed to visitors.
 
 ## Status
 
-**0.1.0 — pre-release.** Structure, caching, rendering, and failure behaviour are built
-and tested. The PCO field mapping still needs one verification pass against a live
-account (see [Verifying the field mapping](#verifying-the-field-mapping)).
+**0.2.0 — pre-release.** Feature-complete for a first client: API client, caching,
+rendering, shortcodes, Bricks elements, Gutenberg blocks, and GitHub auto-updates are
+built and tested. The PCO field mapping still needs one verification pass against a live
+account (see [Verifying the field mapping](#verifying-the-field-mapping)) — that's the
+only thing standing between this and a real deployment.
 
 ## Installation (first time on a new site)
 
@@ -36,6 +38,13 @@ With Bricks active, two native elements appear under the **Planning Center** cat
 Both inherit the site's design automatically and expose an optional accent-color
 override on the Style tab. They delegate to the same code path as the shortcodes, so
 there's one implementation to keep correct.
+
+### Gutenberg blocks
+
+Two server-side-rendered blocks under the **Comms.Church** category: **PCO Groups
+Finder** and **PCO Group Card**. The card block offers a *group picker* populated from
+the live account, so an editor never has to hunt for a numeric ID. Previews in the
+editor are the real front-end output, not a separate implementation.
 
 ### Shortcodes
 
@@ -94,17 +103,24 @@ includes/
   class-ccgrp-shortcodes.php  [cc_groups], [cc_group]
   class-ccgrp-admin.php     settings, connection test, API Inspector
   class-ccgrp-bricks.php    registers Bricks elements when Bricks is active
+  class-ccgrp-blocks.php    two server-side-rendered Gutenberg blocks
+  class-ccgrp-updater.php   GitHub Releases -> native WP update UI
   bricks/element-*.php      Groups Finder + Group Card elements
-assets/groups.css|js        styles + progressive-enhancement filtering
+assets/groups.css|js        front-end styles + progressive-enhancement filtering
+assets/blocks.js            block editor UI (no build step)
 ```
 
 The renderer never sees a raw PCO payload — `flatten()` is the only place that knows
 JSON:API, which is what keeps an API change to a one-file fix.
 
+## Updates
+
+After the first manual install, the plugin checks GitHub Releases and updates appear in
+the normal **Plugins** and **Dashboard → Updates** screens. A "Check for updates" link on
+the Plugins row forces an immediate check. No third-party service is involved.
+
 ## Roadmap
 
-- Gutenberg blocks
-- GitHub-releases auto-updater (reuse `class-ccpco-updater.php`)
 - Optional map view for groups with coordinates
 - Group detail pages (currently the CTA hands off to Church Center)
 

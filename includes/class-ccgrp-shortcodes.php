@@ -100,7 +100,7 @@ class CCGRP_Shortcodes {
         if ( is_wp_error( $group ) ) return CCGRP_Renderer::render_error( $group );
         if ( empty( $group ) )       return self::admin_hint( __( 'That group was not found in Planning Center.', 'comms-church-groups' ) );
 
-        wp_enqueue_style( 'ccgrp' );
+        CCGRP_Renderer::ensure_assets( false ); // single card has no filter bar
         return '<div class="ccgrp">' . CCGRP_Renderer::render_card( $group, array(
             'show_image'    => self::truthy( $atts['image'] ),
             'show_schedule' => self::truthy( $atts['schedule'] ),

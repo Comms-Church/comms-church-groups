@@ -15,13 +15,25 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class CCGRP_Renderer {
 
     /**
+     * Enqueue front-end assets.
+     *
+     * Bricks calls this from an element's enqueue_scripts(); shortcodes call it at
+     * render time. Both paths are safe to call repeatedly — WP dedupes by handle.
+     *
+     * @param bool $with_script Only the filter bar needs JS.
+     */
+    public static function ensure_assets( $with_script = true ) {
+        wp_enqueue_style( 'ccgrp' );
+        if ( $with_script ) wp_enqueue_script( 'ccgrp' );
+    }
+
+    /**
      * Full finder: optional filter bar + responsive card grid.
      *
      * @param array $groups Flattened groups (see CCGRP_API::flatten).
      * @param array $atts   Display options from the shortcode/block.
      */
     public static function render_list( $groups, $atts = array() ) {
-        wp_enqueue_style( 'ccgrp' );
 
         $atts = wp_parse_args( $atts, array(
             'columns'     => 3,
@@ -33,7 +45,7 @@ class CCGRP_Renderer {
         ) );
 
         /* Only the filter bar needs JS, so only load it when we render one. */
-        if ( $atts['show_filter'] ) wp_enqueue_script( 'ccgrp' );
+        self::ensure_assets( (bool) $atts['show_filter'] );
 
         if ( empty( $groups ) ) {
             return '<div class="ccgrp ccgrp--empty"><p>' . esc_html( $atts['empty_text'] ) . '</p></div>';

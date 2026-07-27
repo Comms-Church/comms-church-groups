@@ -39,6 +39,7 @@ require_once CCGRP_DIR . 'includes/class-ccgrp-cache.php';
 require_once CCGRP_DIR . 'includes/class-ccgrp-api.php';
 require_once CCGRP_DIR . 'includes/class-ccgrp-renderer.php';
 require_once CCGRP_DIR . 'includes/class-ccgrp-shortcodes.php';
+require_once CCGRP_DIR . 'includes/class-ccgrp-bricks.php';
 
 if ( is_admin() ) {
     require_once CCGRP_DIR . 'includes/class-ccgrp-admin.php';
@@ -46,6 +47,9 @@ if ( is_admin() ) {
 }
 
 add_action( 'init', array( 'CCGRP_Shortcodes', 'register' ) );
+
+/* Bricks elements register themselves only when Bricks is present. */
+new CCGRP_Bricks();
 
 /* Front-end assets are registered here but only enqueued when a shortcode/block
    actually renders, so pages without groups ship no extra CSS/JS. */

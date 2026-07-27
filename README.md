@@ -24,6 +24,21 @@ token needs access to **Groups**.
 
 ## Usage
 
+### Bricks elements
+
+With Bricks active, two native elements appear under the **Planning Center** category:
+
+| Element | Use |
+|---|---|
+| **PCO Groups Finder** | The full finder — type filter, columns, search, and per-field toggles |
+| **PCO Group Card** | One specific group, by ID |
+
+Both inherit the site's design automatically and expose an optional accent-color
+override on the Style tab. They delegate to the same code path as the shortcodes, so
+there's one implementation to keep correct.
+
+### Shortcodes
+
 Put these anywhere shortcodes run — a page, a Bricks Shortcode element, a block.
 
 | Shortcode | What it does |
@@ -78,6 +93,8 @@ includes/
   class-ccgrp-renderer.php  all HTML; escaping; graceful degradation
   class-ccgrp-shortcodes.php  [cc_groups], [cc_group]
   class-ccgrp-admin.php     settings, connection test, API Inspector
+  class-ccgrp-bricks.php    registers Bricks elements when Bricks is active
+  bricks/element-*.php      Groups Finder + Group Card elements
 assets/groups.css|js        styles + progressive-enhancement filtering
 ```
 
@@ -86,7 +103,6 @@ JSON:API, which is what keeps an API change to a one-file fix.
 
 ## Roadmap
 
-- Bricks elements (mirroring `comms-church-pco`'s `includes/bricks/`)
 - Gutenberg blocks
 - GitHub-releases auto-updater (reuse `class-ccpco-updater.php`)
 - Optional map view for groups with coordinates

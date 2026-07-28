@@ -58,6 +58,7 @@ class CCGRP_Bricks_Groups_List extends \Bricks\Element {
         $this->controls['show_image']    = array( 'tab' => 'content', 'label' => esc_html__( 'Show image', 'comms-church-groups' ),    'type' => 'checkbox', 'default' => true );
         $this->controls['show_schedule'] = array( 'tab' => 'content', 'label' => esc_html__( 'Show schedule', 'comms-church-groups' ), 'type' => 'checkbox', 'default' => true );
         $this->controls['show_location'] = array( 'tab' => 'content', 'label' => esc_html__( 'Show location', 'comms-church-groups' ), 'type' => 'checkbox', 'default' => true );
+        $this->controls['show_desc']     = array( 'tab' => 'content', 'label' => esc_html__( 'Show description', 'comms-church-groups' ), 'type' => 'checkbox', 'default' => true, 'description' => esc_html__( 'Planning Center descriptions are free-form and often contain join instructions — turn off if they read poorly.', 'comms-church-groups' ) );
         $this->controls['empty_text'] = array(
             'tab'         => 'content',
             'label'       => esc_html__( 'Empty message', 'comms-church-groups' ),
@@ -89,6 +90,7 @@ class CCGRP_Bricks_Groups_List extends \Bricks\Element {
             'image'    => $bool( 'show_image' )    ? 'yes' : 'no',
             'schedule' => $bool( 'show_schedule' ) ? 'yes' : 'no',
             'location' => $bool( 'show_location' ) ? 'yes' : 'no',
+            'desc'     => $bool( 'show_desc' )     ? 'yes' : 'no',
         );
         if ( ! empty( $s['empty_text'] ) ) {
             $atts['empty_text'] = sanitize_text_field( $s['empty_text'] );

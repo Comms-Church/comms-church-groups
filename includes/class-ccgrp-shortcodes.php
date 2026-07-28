@@ -33,6 +33,7 @@ class CCGRP_Shortcodes {
             'image'     => 'yes',
             'schedule'  => 'yes',
             'location'  => 'yes',
+            'desc'      => 'yes',
             'empty_text'=> '',
         ), $atts, 'cc_groups' );
 
@@ -51,6 +52,15 @@ class CCGRP_Shortcodes {
             return CCGRP_Renderer::render_error( $groups );
         }
 
+        /* PUBLIC VISIBILITY GATE. Planning Center marks which groups belong in a public
+           directory (`listed`) and which are retired (`archived_at`). A church's account
+           contains plenty of private groups — leadership, care, recovery — that must never
+           appear on a public website. Filtering happens here, after the cache, so the
+           cached payload stays shared while every display surface inherits the gate. */
+        $groups = array_values( array_filter( $groups, function ( $g ) {
+            return ! empty( $g['listed'] ) && empty( $g['archived'] );
+        } ) );
+
         if ( $atts['type'] ) {
             $want = strtolower( trim( $atts['type'] ) );
             $groups = array_values( array_filter( $groups, function ( $g ) use ( $want ) {
@@ -68,6 +78,7 @@ class CCGRP_Shortcodes {
             'show_image'    => self::truthy( $atts['image'] ),
             'show_schedule' => self::truthy( $atts['schedule'] ),
             'show_location' => self::truthy( $atts['location'] ),
+            'show_desc'     => self::truthy( $atts['desc'] ),
         );
         if ( $atts['empty_text'] !== '' ) $opts['empty_text'] = $atts['empty_text'];
 
@@ -81,6 +92,7 @@ class CCGRP_Shortcodes {
             'image'    => 'yes',
             'schedule' => 'yes',
             'location' => 'yes',
+            'desc'     => 'yes',
         ), $atts, 'cc_group' );
 
         if ( '' === $atts['id'] ) {
@@ -100,11 +112,19 @@ class CCGRP_Shortcodes {
         if ( is_wp_error( $group ) ) return CCGRP_Renderer::render_error( $group );
         if ( empty( $group ) )       return self::admin_hint( __( 'That group was not found in Planning Center.', 'comms-church-groups' ) );
 
+        /* Honour PCO's visibility flags even for an explicit embed — the church set them
+           at the data level, and a site editor pasting an ID shouldn't silently override
+           that. Tell the admin why nothing rendered so it isn't a mystery. */
+        if ( empty( $group['listed'] ) || ! empty( $group['archived'] ) ) {
+            return self::admin_hint( __( 'That group is not publicly listed in Planning Center (or is archived), so it is not shown. Change its visibility in Planning Center to display it here.', 'comms-church-groups' ) );
+        }
+
         CCGRP_Renderer::ensure_assets( false ); // single card has no filter bar
         return '<div class="ccgrp">' . CCGRP_Renderer::render_card( $group, array(
             'show_image'    => self::truthy( $atts['image'] ),
             'show_schedule' => self::truthy( $atts['schedule'] ),
             'show_location' => self::truthy( $atts['location'] ),
+            'show_desc'     => self::truthy( $atts['desc'] ),
         ) ) . '</div>';
     }
 

@@ -46,6 +46,7 @@ class CCGRP_Blocks {
                 'showImage'    => array( 'type' => 'boolean', 'default' => true ),
                 'showSchedule' => array( 'type' => 'boolean', 'default' => true ),
                 'showLocation' => array( 'type' => 'boolean', 'default' => true ),
+                'showDesc'     => array( 'type' => 'boolean', 'default' => true ),
                 'emptyText'    => array( 'type' => 'string',  'default' => '' ),
             ),
             'supports' => array( 'html' => false, 'align' => array( 'wide', 'full' ) ),
@@ -62,6 +63,7 @@ class CCGRP_Blocks {
                 'showImage'    => array( 'type' => 'boolean', 'default' => true ),
                 'showSchedule' => array( 'type' => 'boolean', 'default' => true ),
                 'showLocation' => array( 'type' => 'boolean', 'default' => true ),
+                'showDesc'     => array( 'type' => 'boolean', 'default' => true ),
             ),
             'supports' => array( 'html' => false ),
         ) );
@@ -78,6 +80,7 @@ class CCGRP_Blocks {
             'image'    => ! empty( $attr['showImage'] )    ? 'yes' : 'no',
             'schedule' => ! empty( $attr['showSchedule'] ) ? 'yes' : 'no',
             'location' => ! empty( $attr['showLocation'] ) ? 'yes' : 'no',
+            'desc'     => ! empty( $attr['showDesc'] )     ? 'yes' : 'no',
         );
         if ( ! empty( $attr['emptyText'] ) ) {
             $atts['empty_text'] = sanitize_text_field( $attr['emptyText'] );
@@ -106,6 +109,7 @@ class CCGRP_Blocks {
             'image'    => ! empty( $attr['showImage'] )    ? 'yes' : 'no',
             'schedule' => ! empty( $attr['showSchedule'] ) ? 'yes' : 'no',
             'location' => ! empty( $attr['showLocation'] ) ? 'yes' : 'no',
+            'desc'     => ! empty( $attr['showDesc'] )     ? 'yes' : 'no',
         ) );
 
         if ( '' === trim( $out ) && $this->is_editor_request() ) {

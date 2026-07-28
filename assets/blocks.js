@@ -57,6 +57,13 @@
 				checked: !! a.showLocation,
 				onChange: function ( v ) { set( { showLocation: v } ); },
 			} ),
+			el( ToggleControl, {
+				key: 'desc',
+				label: __( 'Show description', 'comms-church-groups' ),
+				checked: !! a.showDesc,
+				onChange: function ( v ) { set( { showDesc: v } ); },
+				help: __( 'PCO descriptions often contain join instructions.', 'comms-church-groups' ),
+			} ),
 		];
 	}
 

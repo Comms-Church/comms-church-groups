@@ -41,6 +41,7 @@ class CCGRP_Renderer {
             'show_image'  => true,
             'show_schedule' => true,
             'show_location' => true,
+            'show_desc'   => true,
             'empty_text'  => __( 'No groups are open right now — check back soon.', 'comms-church-groups' ),
         ) );
 
@@ -107,12 +108,22 @@ class CCGRP_Renderer {
     public static function render_card( $g, $atts = array() ) {
         $atts = wp_parse_args( $atts, array(
             'show_image' => true, 'show_schedule' => true, 'show_location' => true,
+            'show_desc'  => true,
         ) );
 
         $type     = $g['group_type']['name'] ?? '';
-        $loc      = $g['location']['name'] ?? ( $g['location']['address'] ?? '' );
         $open     = self::is_open( $g );
         $signup   = $g['signup_url'] ?? '';
+
+        /* Location: physical name/address when there is one, otherwise say "Online" for
+           virtual groups. PCO often returns no Location relationship at all (groups that
+           meet at a member's home, or online), so an empty row is normal — not an error. */
+        $loc = $g['location']['name'] ?? ( $g['location']['address'] ?? '' );
+        if ( '' === trim( (string) $loc ) ) {
+            $is_virtual = ! empty( $g['virtual_url'] )
+                || 'virtual' === ( $g['location_pref'] ?? '' );
+            if ( $is_virtual ) $loc = __( 'Online', 'comms-church-groups' );
+        }
 
         /* Descriptions come from PCO as author-entered HTML. kses_post keeps safe
            formatting (links, emphasis, lists) and strips scripts/iframes. */
@@ -138,7 +149,7 @@ class CCGRP_Renderer {
 
                 <h3 class="ccgrp-card__title"><?php echo esc_html( $g['name'] ); ?></h3>
 
-                <?php if ( $desc ) : ?>
+                <?php if ( $atts['show_desc'] && $desc ) : ?>
                     <p class="ccgrp-card__desc"><?php echo esc_html( $desc ); ?></p>
                 <?php endif; ?>
 

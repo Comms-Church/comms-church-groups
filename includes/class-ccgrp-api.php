@@ -201,16 +201,35 @@ class CCGRP_API {
             $image = $img;
         }
 
+        /* PCO ships a pre-stripped plain-text description — prefer it over stripping the
+           rich-text field ourselves, since group descriptions routinely contain headings
+           and lists that a naive strip mangles. */
+        $description = $a['description_as_plain_text'] ?? '';
+        if ( '' === trim( (string) $description ) ) {
+            $description = $a['description'] ?? '';
+        }
+
         return array(
             'id'            => (string) $resource['id'],
             'name'          => $a['name'] ?? '',
-            'description'   => $a['description'] ?? '',
+            'description'   => $description,
             'schedule'      => $a['schedule'] ?? '',
             'image'         => $image,
             'contact_email' => $a['contact_email'] ?? '',
             'members'       => $a['memberships_count'] ?? null,
+            /* Not present on the Group resource in current API versions — kept so the
+               renderer has something to read, and is_open() defaults to open when blank. */
             'enrollment'    => $a['enrollment'] ?? ( $a['enrollment_strategy'] ?? '' ),
             'signup_url'    => $a['public_church_center_web_url'] ?? '',
+            /* Online/hybrid groups carry a meeting URL instead of a physical location. */
+            'virtual_url'   => $a['virtual_location_url'] ?? '',
+            'location_pref' => $a['location_type_preference'] ?? '',
+            /* PUBLIC VISIBILITY. `listed` is PCO's "show this in the public directory"
+               flag and `archived_at` marks retired groups. Both must be honoured or a
+               public finder will expose private and defunct groups. Default to NOT
+               listed when the field is absent — fail closed, never leak. */
+            'listed'        => array_key_exists( 'listed', $a ) ? (bool) $a['listed'] : false,
+            'archived'      => ! empty( $a['archived_at'] ),
             'location'      => $location,
             'group_type'    => $group_type,
             'raw'           => $a,

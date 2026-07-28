@@ -34,6 +34,7 @@ class CCGRP_Bricks_Group_Card extends \Bricks\Element {
         $this->controls['show_image']    = array( 'tab' => 'content', 'label' => esc_html__( 'Show image', 'comms-church-groups' ),    'type' => 'checkbox', 'default' => true );
         $this->controls['show_schedule'] = array( 'tab' => 'content', 'label' => esc_html__( 'Show schedule', 'comms-church-groups' ), 'type' => 'checkbox', 'default' => true );
         $this->controls['show_location'] = array( 'tab' => 'content', 'label' => esc_html__( 'Show location', 'comms-church-groups' ), 'type' => 'checkbox', 'default' => true );
+        $this->controls['show_desc']     = array( 'tab' => 'content', 'label' => esc_html__( 'Show description', 'comms-church-groups' ), 'type' => 'checkbox', 'default' => true );
         $this->controls['accent'] = array(
             'tab'         => 'style',
             'label'       => esc_html__( 'Accent color', 'comms-church-groups' ),
@@ -72,6 +73,7 @@ class CCGRP_Bricks_Group_Card extends \Bricks\Element {
             'image'    => $bool( 'show_image' )    ? 'yes' : 'no',
             'schedule' => $bool( 'show_schedule' ) ? 'yes' : 'no',
             'location' => $bool( 'show_location' ) ? 'yes' : 'no',
+            'desc'     => $bool( 'show_desc' )     ? 'yes' : 'no',
         ) );
 
         echo '</div>';

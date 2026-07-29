@@ -1,0 +1,9 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "steps": [
+    {
+      "step": "runPHP",
+      "code": "<?php require_once '/wordpress/wp-load.php'; if ( get_page_by_path( 'groups' ) ) { return; } wp_insert_post([ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Groups', 'post_name' => 'groups', 'post_content' => '[cc_groups]' ]); flush_rewrite_rules();"
+    }
+  ]
+}

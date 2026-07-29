@@ -3,7 +3,7 @@
  * Plugin Name:       Comms.Church — Planning Center Groups
  * Plugin URI:        https://github.com/Comms-Church/comms-church-groups
  * Description:       A public small-groups finder powered by Planning Center Groups. Browse, filter, and sign up for groups via shortcodes, blocks, and Bricks elements. API credentials stored securely server-side.
- * Version:           0.2.0
+ * Version:           0.2.2
  * Author:            Comms.Church
  * Author URI:        https://comms.church
  * License:           GPL-2.0+
@@ -29,7 +29,7 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
     return;
 }
 
-define( 'CCGRP_VERSION', '0.2.0' );
+define( 'CCGRP_VERSION', '0.2.2' );
 define( 'CCGRP_FILE', __FILE__ );
 define( 'CCGRP_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CCGRP_URL', plugin_dir_url( __FILE__ ) );

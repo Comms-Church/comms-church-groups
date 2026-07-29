@@ -39,14 +39,33 @@ class CCGRP_Cache {
         return self::$gen;
     }
 
-    /** Live key: salted with generation, so flushes orphan it instantly. */
-    private static function live_key( $cache_key ) {
-        return 'ccgrp_' . md5( self::generation() . '|' . $cache_key );
+    /**
+     * Version salt.
+     *
+     * Cached payloads are shaped by CCGRP_API::flatten(), so an update that adds or
+     * renames a field leaves old-shaped arrays in the cache. Readers then look for a
+     * field that isn't there — and for the visibility gate that means every group is
+     * filtered out and the finder goes blank until the TTL expires.
+     *
+     * Salting the keys with the plugin version makes an update orphan those payloads
+     * automatically. Costs one cache miss per release; removes a whole class of
+     * "it went blank after I updated" reports.
+     */
+    private static function version_salt() {
+        return defined( 'CCGRP_VERSION' ) ? CCGRP_VERSION : '0';
     }
 
-    /** Stale key: NOT generation-salted — survives flushes on purpose. */
+    /** Live key: salted with version + generation, so flushes orphan it instantly. */
+    private static function live_key( $cache_key ) {
+        return 'ccgrp_' . md5( self::version_salt() . '|' . self::generation() . '|' . $cache_key );
+    }
+
+    /**
+     * Stale key: NOT generation-salted — survives flushes on purpose. It IS version
+     * salted, though: a flush-then-failed-fetch must not resurrect an old-shaped payload.
+     */
     private static function stale_key( $cache_key ) {
-        return 'ccgrp_s_' . md5( $cache_key );
+        return 'ccgrp_s_' . md5( self::version_salt() . '|' . $cache_key );
     }
 
     /** Breaker key: NOT generation-salted — a rate limit is a rate limit. */

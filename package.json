@@ -3,7 +3,7 @@
   "private": true,
   "description": "Planning Center Groups finder for WordPress",
   "scripts": {
-    "wp": "wp-playground-cli server --auto-mount --login --port 9401 --blueprint tests/blueprint.json",
+    "wp": "wp-playground-cli server --auto-mount --login --port 9403 --blueprint tests/blueprint.json",
     "test": "playwright test --project=smoke",
     "screenshots": "playwright test --project=screenshots"
   },

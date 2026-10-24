@@ -62,8 +62,8 @@
 }
 /* Only the button acts, so the card doesn't lift like a link would. */
 .ccgrp-card:hover { border-color: var(--ccgrp-field-border); }
-.ccgrp-card[hidden] { display: none; }
-/* Cards that come back after filtering fade in rather than popping. */
+.ccgrp-card[hidden] { display: none; opacity: 0; }
+/* Filtered cards fade out and back in rather than popping. */
 .ccgrp-card { transition: border-color .2s ease, opacity .15s ease-out, display .15s allow-discrete; }
 @starting-style { .ccgrp-card { opacity: 0; } }
 

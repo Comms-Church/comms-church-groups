@@ -59,10 +59,18 @@ class CCGRP_Renderer {
         ?>
         <div class="ccgrp" style="<?php echo esc_attr( $style ); ?>">
             <?php if ( $atts['show_filter'] ) echo self::render_filter( $groups ); ?>
+            <?php if ( $atts['show_filter'] ) : ?>
+                <?php /* translators: 1: groups shown, 2: total groups */ ?>
+                <p class="ccgrp-status" role="status" aria-live="polite"
+                   data-template="<?php echo esc_attr__( 'Showing %1$d of %2$d groups', 'comms-church-groups' ); ?>"></p>
+            <?php endif; ?>
             <div class="ccgrp-grid ccgrp-grid--<?php echo (int) $cols; ?>" role="list">
                 <?php foreach ( $groups as $g ) echo self::render_card( $g, $atts ); ?>
             </div>
-            <p class="ccgrp-noresults" hidden><?php esc_html_e( 'No groups match those filters.', 'comms-church-groups' ); ?></p>
+            <p class="ccgrp-noresults" hidden>
+                <?php esc_html_e( 'No groups match those filters.', 'comms-church-groups' ); ?>
+                <button type="button" class="ccgrp-reset"><?php esc_html_e( 'Show all groups', 'comms-church-groups' ); ?></button>
+            </p>
         </div>
         <?php
         return ob_get_clean();

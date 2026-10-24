@@ -55,6 +55,10 @@ class CCGRP_Renderer {
         $cols  = max( 1, min( 4, (int) $atts['columns'] ) );
         $style = self::inline_vars();
 
+        /* If any card has artwork, give the rest a placeholder so titles line up. */
+        $atts['media_placeholder'] = $atts['show_image']
+            && (bool) array_filter( $groups, function ( $g ) { return ! empty( $g['image'] ); } );
+
         ob_start();
         ?>
         <div class="ccgrp" style="<?php echo esc_attr( $style ); ?>">
@@ -116,7 +120,7 @@ class CCGRP_Renderer {
     public static function render_card( $g, $atts = array() ) {
         $atts = wp_parse_args( $atts, array(
             'show_image' => true, 'show_schedule' => true, 'show_location' => true,
-            'show_desc'  => true,
+            'show_desc'  => true, 'media_placeholder' => false,
         ) );
 
         $type     = $g['group_type']['name'] ?? '';
@@ -148,6 +152,10 @@ class CCGRP_Renderer {
                 <div class="ccgrp-card__media">
                     <img src="<?php echo esc_url( $g['image'] ); ?>" alt="" loading="lazy" decoding="async">
                 </div>
+            <?php elseif ( $atts['media_placeholder'] ) : ?>
+                <div class="ccgrp-card__media ccgrp-card__media--empty" aria-hidden="true">
+                    <span><?php echo esc_html( function_exists( 'mb_substr' ) ? mb_substr( $g['name'], 0, 1 ) : substr( $g['name'], 0, 1 ) ); ?></span>
+                </div>
             <?php endif; ?>
 
             <div class="ccgrp-card__body">
@@ -176,6 +184,8 @@ class CCGRP_Renderer {
                             <?php echo $open
                                 ? esc_html__( 'Join this group', 'comms-church-groups' )
                                 : esc_html__( 'View group', 'comms-church-groups' ); ?>
+                            <svg class="ccgrp-ext" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M4 2h6v6M10 2L3 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="screen-reader-text"><?php esc_html_e( '(opens in a new tab)', 'comms-church-groups' ); ?></span>
                         </a>
                     <?php elseif ( ! empty( $g['contact_email'] ) ) : ?>
                         <a class="ccgrp-btn" href="mailto:<?php echo esc_attr( $g['contact_email'] ); ?>">

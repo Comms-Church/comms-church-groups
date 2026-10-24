@@ -12,6 +12,8 @@
 		var type   = root.querySelector( '.ccgrp-type' );
 		var cards  = Array.prototype.slice.call( root.querySelectorAll( '.ccgrp-card' ) );
 		var empty  = root.querySelector( '.ccgrp-noresults' );
+		var status = root.querySelector( '.ccgrp-status' );
+		var reset  = root.querySelector( '.ccgrp-reset' );
 
 		if ( ! cards.length || ( ! search && ! type ) ) return;
 
@@ -30,17 +32,25 @@
 			} );
 
 			if ( empty ) empty.hidden = shown !== 0;
+
+			// Say how many are left; stay quiet when nothing is filtered.
+			if ( status ) {
+				status.textContent = ( q || t )
+					? ( status.getAttribute( 'data-template' ) || '%1$d / %2$d' )
+						.replace( '%1$d', shown ).replace( '%2$d', cards.length )
+					: '';
+			}
 		}
 
-		// Debounced so typing in a large list doesn't thrash layout.
-		var timer = null;
-		function debounced() {
-			window.clearTimeout( timer );
-			timer = window.setTimeout( apply, 120 );
-		}
-
-		if ( search ) search.addEventListener( 'input', debounced );
+		// Filtering is in-memory over rendered cards, so respond on every keystroke.
+		if ( search ) search.addEventListener( 'input', apply );
 		if ( type ) type.addEventListener( 'change', apply );
+		if ( reset ) reset.addEventListener( 'click', function () {
+			if ( search ) search.value = '';
+			if ( type ) type.value = '';
+			apply();
+			( search || type ).focus();
+		} );
 	}
 
 	function boot() {

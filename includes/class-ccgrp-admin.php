@@ -16,6 +16,15 @@ class CCGRP_Admin {
         add_action( 'admin_menu', array( $this, 'menu' ) );
         add_action( 'admin_init', array( $this, 'settings' ) );
         add_action( 'admin_notices', array( $this, 'setup_notice' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
+    }
+
+    /** WordPress's own color picker for the accent setting. */
+    public function enqueue( $hook ) {
+        if ( 'settings_page_ccgrp-settings' !== $hook ) return;
+        wp_enqueue_style( 'wp-color-picker' );
+        wp_enqueue_script( 'wp-color-picker' );
+        wp_add_inline_script( 'wp-color-picker', 'jQuery(function($){ $("#ccgrp_brand_color").wpColorPicker(); });' );
     }
 
     public function menu() {
@@ -29,9 +38,18 @@ class CCGRP_Admin {
     }
 
     public function settings() {
-        foreach ( array( 'ccgrp_app_id', 'ccgrp_secret', 'ccgrp_cache_ttl', 'ccgrp_brand_color' ) as $opt ) {
-            register_setting( 'ccgrp_settings', $opt );
-        }
+        register_setting( 'ccgrp_settings', 'ccgrp_app_id' );
+        register_setting( 'ccgrp_settings', 'ccgrp_cache_ttl' );
+        /* A blank or malformed value clears the accent rather than breaking the CSS variable. */
+        register_setting( 'ccgrp_settings', 'ccgrp_brand_color', array( 'sanitize_callback' => 'sanitize_hex_color' ) );
+        /* The Secret field is rendered empty so the value never reaches the page source;
+           submitting it blank keeps the saved one. */
+        register_setting( 'ccgrp_settings', 'ccgrp_secret', array(
+            'sanitize_callback' => function ( $v ) {
+                $v = trim( (string) $v );
+                return '' === $v ? get_option( 'ccgrp_secret', '' ) : sanitize_text_field( $v );
+            },
+        ) );
         /* Credentials changing means every cached payload is suspect. */
         add_action( 'update_option_ccgrp_app_id', array( 'CCGRP_Cache', 'flush_all' ) );
         add_action( 'update_option_ccgrp_secret', array( 'CCGRP_Cache', 'flush_all' ) );
@@ -56,8 +74,11 @@ class CCGRP_Admin {
         $test     = null;
         $inspect  = null;
 
-        /* Connection test */
+        /* Connection test — on request, and automatically right after a save so the
+           result always describes the credentials that were just entered. */
         if ( isset( $_POST['ccgrp_test'] ) && check_admin_referer( 'ccgrp_test' ) ) {
+            $test = $api->test_connection();
+        } elseif ( isset( $_GET['settings-updated'] ) && get_option( 'ccgrp_app_id' ) && get_option( 'ccgrp_secret' ) ) {
             $test = $api->test_connection();
         }
 
@@ -85,9 +106,10 @@ class CCGRP_Admin {
                     <tr>
                         <th><label for="ccgrp_secret"><?php esc_html_e( 'Secret', 'comms-church-groups' ); ?></label></th>
                         <td>
-                            <input name="ccgrp_secret" id="ccgrp_secret" type="password" class="regular-text"
-                                   value="<?php echo esc_attr( get_option( 'ccgrp_secret', '' ) ); ?>" autocomplete="new-password">
-                            <p class="description"><?php esc_html_e( 'Stored server-side and never exposed to visitors.', 'comms-church-groups' ); ?></p>
+                            <?php $has_secret = '' !== (string) get_option( 'ccgrp_secret', '' ); ?>
+                            <input name="ccgrp_secret" id="ccgrp_secret" type="password" class="regular-text" value=""
+                                   placeholder="<?php echo $has_secret ? esc_attr__( 'Saved — leave blank to keep', 'comms-church-groups' ) : ''; ?>" autocomplete="new-password">
+                            <p class="description"><?php esc_html_e( 'Stored server-side and never shown again, here or to visitors.', 'comms-church-groups' ); ?></p>
                         </td>
                     </tr>
                     <tr>
@@ -101,7 +123,7 @@ class CCGRP_Admin {
                     <tr>
                         <th><label for="ccgrp_brand_color"><?php esc_html_e( 'Accent color', 'comms-church-groups' ); ?></label></th>
                         <td>
-                            <input name="ccgrp_brand_color" id="ccgrp_brand_color" type="text" class="regular-text" placeholder="#556136"
+                            <input name="ccgrp_brand_color" id="ccgrp_brand_color" type="text" class="regular-text" data-default-color="" placeholder="#556136"
                                    value="<?php echo esc_attr( get_option( 'ccgrp_brand_color', '' ) ); ?>">
                             <p class="description"><?php esc_html_e( 'Optional. Leave blank to inherit the theme via CSS.', 'comms-church-groups' ); ?></p>
                         </td>
@@ -113,9 +135,10 @@ class CCGRP_Admin {
             <hr>
 
             <h2><?php esc_html_e( 'Connection', 'comms-church-groups' ); ?></h2>
+            <p class="description"><?php esc_html_e( 'Saving new credentials tests them automatically. This button re-tests what is saved, not what is typed above.', 'comms-church-groups' ); ?></p>
             <form method="post">
                 <?php wp_nonce_field( 'ccgrp_test' ); ?>
-                <button class="button" name="ccgrp_test" value="1"><?php esc_html_e( 'Test connection', 'comms-church-groups' ); ?></button>
+                <button class="button" name="ccgrp_test" value="1"><?php esc_html_e( 'Test saved connection', 'comms-church-groups' ); ?></button>
             </form>
             <?php if ( null !== $test ) : ?>
                 <?php if ( is_wp_error( $test ) ) : ?>

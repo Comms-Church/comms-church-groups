@@ -4,6 +4,10 @@ A public small-groups finder powered by Planning Center Groups. Browse, search, 
 filter groups, then hand off to Church Center for the actual signup. API credentials
 are stored server-side and never exposed to visitors.
 
+## Pay what's fair
+
+This plugin is free so churches can spend less on their websites. If you use it in paid work — building or managing church websites for a fee — we ask that you [pay what you think is fair](https://buy.stripe.com/00w5kD8BF21R6SigP62B201). There are no license keys and no checks; it's the honor system. It keeps the plugins maintained and free for everyone else.
+
 ## Status
 
 **0.2.0 — pre-release.** Feature-complete for a first client: API client, caching,
